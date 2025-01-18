@@ -4,12 +4,15 @@ import { ChevronDown } from "lucide-react";
 import ShuckleStats from "./stats";
 import ShuckleFacts from "./facts";
 import ShuckleAbout from "./about";
+import ShuckleCards from "./cards";
+import BouncingShuckleBackground from "./bouncing";
 
 const ShucklePage = () => {
   const [animationPhase, setAnimationPhase] = useState<
     "initial" | "bounceDown" | "bounceUp" | "final"
   >("initial");
   const shuckleRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Initial delay before animation starts
@@ -25,10 +28,17 @@ const ShucklePage = () => {
           setAnimationPhase("final");
         }, 400); // Duration of upward bounce
       }, 400); // Duration of downward motion
-    }, 1500); // Initial delay in milliseconds
+    }, 500); // Initial delay in milliseconds
 
     return () => clearTimeout(startTimeout);
   }, []);
+
+  const scrollToContent = () => {
+    contentRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   // Animation position calculations
   const getTransform = (phase: typeof animationPhase) => {
@@ -64,6 +74,7 @@ const ShucklePage = () => {
     <div className="min-h-screen bg-slate-900">
       {/* Hero Section */}
       <div className="relative h-screen flex flex-col items-center justify-center text-center p-4 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+        <BouncingShuckleBackground />
         {/* Hero image */}
         <div ref={shuckleRef} className="relative w-64 h-64 mb-8">
           <div className="rounded-full bg-red-900/30 border-4 border-red-600/40 flex items-center justify-center overflow-hidden">
@@ -97,16 +108,23 @@ const ShucklePage = () => {
           Don't Fuckle with Shuckle!
         </p>
 
-        <div className="absolute bottom-8 animate-bounce">
-          <p className="text-red-400 mb-2">
+        <div className="absolute bottom-8 flex flex-col items-center gap-4">
+          <p className="text-red-400">
             Scroll down to learn more about Shuckle
           </p>
-          <ChevronDown className="w-8 h-8 text-red-400 mx-auto" />
+          <button
+            onClick={scrollToContent}
+            className="flex flex-col items-center gap-2 text-red-400 hover:text-red-300 transition-colors duration-200"
+            aria-label="Scroll to content"
+          >
+            <ChevronDown className="w-8 h-8 animate-bounce" />
+            <span className="text-sm">Click to scroll</span>
+          </button>
         </div>
       </div>
 
       {/* Rest of the content */}
-      <div className="max-w-4xl mx-auto px-4 py-16">
+      <div ref={contentRef} className="max-w-4xl mx-auto px-4 py-16">
         <section className="mb-16">
           <ShuckleAbout />
         </section>
@@ -117,6 +135,9 @@ const ShucklePage = () => {
 
         <section className="mb-16">
           <ShuckleFacts />
+        </section>
+        <section className="mb-16">
+          <ShuckleCards />
         </section>
       </div>
     </div>
